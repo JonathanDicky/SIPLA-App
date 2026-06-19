@@ -61,15 +61,20 @@ func main() {
 		defer rows.Close()
 
 		var aspirasis []Aspirasi
-		baseURL := getBaseURL()
+
+		baseURL := "https://sipla-app-backend.vercel.app"
 
 		for rows.Next() {
 			var a Aspirasi
 			if err := rows.Scan(&a.ID, &a.IdUser, &a.IdKategori, &a.Deskripsi, &a.Foto, &a.Status); err != nil {
 				return c.Status(500).SendString(err.Error())
 			}
-			// Gabungkan dengan domain dinamis
-			a.Foto = fmt.Sprintf("%s/assets/pengaduan/%s", baseURL, a.Foto)
+
+			// Gabungkan secara bersih. Pastikan data di DB cuma nama filenya aja.
+			if a.Foto != "" {
+				a.Foto = fmt.Sprintf("%s/assets/pengaduan/%s", baseURL, a.Foto)
+			}
+
 			aspirasis = append(aspirasis, a)
 		}
 
