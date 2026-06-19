@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8080/api' // Jika jalan untuk laptop sendiri uncomment url ini.
+const API_URL = 'https://sipla-app-backend.vercel.app' // Jika jalan untuk laptop sendiri uncomment url ini.
 
 // const API_URL = 'http://192.168.1.5:8080/api' // IP Laptop atau IP Server agar bisa diakses dari laptop lain di jaringan yang sama
 
