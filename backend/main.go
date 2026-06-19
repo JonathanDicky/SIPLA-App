@@ -46,7 +46,7 @@ func main() {
 	// Ambil Base URL secara dinamis
 	getBaseURL := func() string {
 		baseURL := os.Getenv("APP_URL")
-		if baseURL == "" {
+		if baseURL == "https://sipla-app-backend.vercel.app" {
 			return "http://localhost:8080"
 		}
 		return baseURL
