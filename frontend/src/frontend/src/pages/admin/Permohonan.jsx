@@ -226,7 +226,7 @@ export default function AdminPermohonan() {
                   {[['KTP', selected.file_ktp], ['Kartu Keluarga', selected.file_kk], ['File Pendukung', selected.file_pendukung]].map(([label, file]) => file && (
                     <div key={label} className="flex items-center justify-between bg-gray-50 rounded-xl p-3">
                       <span className="text-gray-700">📎 {label}</span>
-                      <a href={`https://sipla-app-backend.vercel.app/${file}`} target="_blank" rel="noreferrer"
+                      <a href={`https://sipla-app-production.up.railway.app/${file}`} target="_blank" rel="noreferrer"
                         className="text-emerald-600 text-xs underline">Lihat / Download</a>
                     </div>
                   ))}
@@ -235,7 +235,7 @@ export default function AdminPermohonan() {
               {selected.file_hasil && (
                 <div className="bg-green-50 rounded-xl p-3">
                   <p className="text-xs text-gray-500 mb-1">File Hasil Sebelumnya</p>
-                  <a href={`https://sipla-app-backend.vercel.app/${selected.file_hasil}`} target="_blank" rel="noreferrer"
+                  <a href={`https://sipla-app-production.up.railway.app/${selected.file_hasil}`} target="_blank" rel="noreferrer"
                     className="text-green-700 text-sm underline">📄 Lihat file hasil</a>
                 </div>
               )}

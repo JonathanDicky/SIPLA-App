@@ -139,7 +139,7 @@ func main() {
 		if baseURL == "" {
 			baseURL = "http://localhost:8080"
 		} else {
-			baseURL = "https://" + baseURL
+			baseURL = "https://sipla-app-production.up.railway.app" + baseURL
 		}
 
 		for rows.Next() {
@@ -180,7 +180,7 @@ func main() {
 		if baseURL == "" {
 			baseURL = "http://localhost:8080"
 		} else {
-			baseURL = "https://" + baseURL
+			baseURL = "https://sipla-app-production.up.railway.app" + baseURL
 		}
 
 		return c.JSON(fiber.Map{

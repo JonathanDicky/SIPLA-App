@@ -384,7 +384,7 @@ export default function UserAspirasi() {
               </div>
               {selected.foto && (
                 <img
-                  src={`http://localhost:8080/${selected.foto}`}
+                  src={`https://sipla-app-production.up.railway.app/${selected.foto}`}
                   alt="foto"
                   className="rounded-xl w-full object-cover max-h-48"
                 />
@@ -398,7 +398,7 @@ export default function UserAspirasi() {
                       <p className="text-gray-700 mt-1">{t.tanggapan}</p>
                       {t.file_bukti && (
                         <a
-                          href={`http://localhost:8080/${t.file_bukti}`}
+                          href={`https://sipla-app-production.up.railway.app/${t.file_bukti}`}
                           target="_blank" rel="noreferrer"
                           className="text-emerald-600 text-xs underline mt-1 block"
                         >

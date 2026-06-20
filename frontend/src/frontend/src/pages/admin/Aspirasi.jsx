@@ -225,7 +225,7 @@ export default function AdminAspirasi() {
                 {selected.latitude && <p className="text-gray-400 text-xs">🗺️ {selected.latitude}, {selected.longitude}</p>}
               </div>
               {selected.foto && (
-                <img src={`https://sipla-app-backend.vercel.app/${selected.foto}`} alt="foto" className="rounded-xl max-h-48 object-cover w-full" />
+                <img src={`https://sipla-app-production.up.railway.app/${selected.foto}`} alt="foto" className="rounded-xl max-h-48 object-cover w-full" />
               )}
               {selected.tanggapan?.length > 0 && (
                 <div>
@@ -235,7 +235,7 @@ export default function AdminAspirasi() {
                       <p className="font-semibold text-emerald-800">{t.petugas?.nama_petugas}</p>
                       <p className="text-gray-700 mt-1">{t.tanggapan}</p>
                       {t.file_bukti && (
-                        <a href={`https://sipla-app-backend.vercel.app/${t.file_bukti}`} target="_blank" rel="noreferrer"
+                        <a href={`https://sipla-app-production.up.railway.app/${t.file_bukti}`} target="_blank" rel="noreferrer"
                           className="text-emerald-600 text-xs underline mt-1 block">📎 Lihat file bukti</a>
                       )}
                       <p className="text-gray-400 text-xs mt-1">{new Date(t.tgl_tanggapan).toLocaleString('id-ID')}</p>

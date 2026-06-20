@@ -185,7 +185,7 @@ export default function UserPengaduan() {
               <p><span className="text-gray-500">Lokasi:</span> {selected.lokasi_kejadian}</p>
               <p><span className="text-gray-500">Tgl Kejadian:</span> {new Date(selected.tgl_kejadian).toLocaleDateString('id-ID')}</p>
               {selected.foto && (
-                <img src={`http://localhost:8080/${selected.foto}`} alt="foto" className="rounded-lg max-h-48 w-full object-cover" />
+                <img src={`https://sipla-app-production.up.railway.app/${selected.foto}`} alt="foto" className="rounded-lg max-h-48 w-full object-cover" />
               )}
 
               {selected.tanggapan?.length > 0 && (

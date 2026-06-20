@@ -336,7 +336,7 @@ export default function UserPermohonan() {
               {selected.file_hasil && (
                 <div className="bg-green-50 rounded-xl p-3">
                   <p className="font-medium text-green-800 text-xs mb-1">Hasil / Surat</p>
-                  <a href={`http://localhost:8080/${selected.file_hasil}`} target="_blank" rel="noreferrer"
+                  <a href={`https://sipla-app-production.up.railway.app/${selected.file_hasil}`} target="_blank" rel="noreferrer"
                     className="text-green-700 underline">📄 Download file hasil</a>
                 </div>
               )}
@@ -351,7 +351,7 @@ export default function UserPermohonan() {
                 ].map(([l, f]) => f && (
                   <div key={l} className="flex justify-between bg-gray-50 rounded-xl p-3 mb-1">
                     <span className="text-gray-600">{l}</span>
-                    <a href={`http://localhost:8080/${f}`} target="_blank" rel="noreferrer"
+                    <a href={`https://sipla-app-production.up.railway.app/${f}`} target="_blank" rel="noreferrer"
                       className="text-emerald-600 text-xs underline">Lihat</a>
                   </div>
                 ))}
