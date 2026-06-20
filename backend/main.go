@@ -34,7 +34,6 @@ type Aspirasi struct {
 	Status     string `json:"status"`
 }
 
-// Fungsi penyelamat untuk mengubah format mysql:// Railway menjadi format standar Go Driver
 func parseDSN(dsn string) string {
 	if strings.HasPrefix(dsn, "mysql://") {
 		dsn = strings.TrimPrefix(dsn, "mysql://")
@@ -59,6 +58,8 @@ func parseDSN(dsn string) string {
 	return dsn
 }
 
+// ... (bagian type struct dan parseDSN tetep sama seperti kemarin) ...
+
 func main() {
 	rawDSN := os.Getenv("DATABASE_URL")
 	var dsn string
@@ -66,7 +67,6 @@ func main() {
 	if rawDSN == "" {
 		dsn = "root:@tcp(127.0.0.1:3306)/sipla"
 	} else {
-		// Bersihkan otomatis string URL dari Railway
 		dsn = parseDSN(rawDSN)
 	}
 
@@ -78,11 +78,24 @@ func main() {
 
 	app := fiber.New()
 
+	// 1. SETUP CORS YANG LEBIH KETAT & AMAN UNTUK BROWSER
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
-		AllowMethods: "GET, POST, PUT, DELETE, OPTIONS",
+		AllowOrigins:     "*",
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-Requested-With",
+		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
+		AllowCredentials: false,
 	}))
+
+	// 2. BARIS SAKTI: Intercept semua request OPTIONS (Preflight) langsung balikin 200 OK
+	app.Use(func(c *fiber.Ctx) error {
+		if c.Method() == "OPTIONS" {
+			c.Set("Access-Control-Allow-Origin", "*")
+			c.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			c.Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization, X-Requested-With")
+			return c.SendStatus(200)
+		}
+		return c.Next()
+	})
 
 	app.Static("/assets/pengaduan", "./assets/pengaduan")
 
