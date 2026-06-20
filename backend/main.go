@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -33,10 +34,40 @@ type Aspirasi struct {
 	Status     string `json:"status"`
 }
 
+// Fungsi penyelamat untuk mengubah format mysql:// Railway menjadi format standar Go Driver
+func parseDSN(dsn string) string {
+	if strings.HasPrefix(dsn, "mysql://") {
+		dsn = strings.TrimPrefix(dsn, "mysql://")
+
+		// Pisahkan antara user:pass dan host:port/db
+		parts := strings.SplitN(dsn, "@", 2)
+		if len(parts) == 2 {
+			credentials := parts[0]
+			remain := parts[1]
+
+			// Pisahkan antara host:port dan nama database
+			subParts := strings.SplitN(remain, "/", 2)
+			if len(subParts) == 2 {
+				hostPort := subParts[0]
+				dbName := subParts[1]
+
+				// Buat format standar: user:password@tcp(host:port)/dbname
+				return fmt.Sprintf("%s@tcp(%s)/%s", credentials, hostPort, dbName)
+			}
+		}
+	}
+	return dsn
+}
+
 func main() {
-	dsn := os.Getenv("DATABASE_URL")
-	if dsn == "" {
+	rawDSN := os.Getenv("DATABASE_URL")
+	var dsn string
+
+	if rawDSN == "" {
 		dsn = "root:@tcp(127.0.0.1:3306)/sipla"
+	} else {
+		// Bersihkan otomatis string URL dari Railway
+		dsn = parseDSN(rawDSN)
 	}
 
 	db, err := sql.Open("mysql", dsn)
@@ -134,12 +165,11 @@ func main() {
 
 		var aspirasis []Aspirasi
 
-		// Taruh domain backend Railway lu di sini nanti kalau sudah dapet URL-nya!
 		baseURL := os.Getenv("RAILWAY_STATIC_URL")
 		if baseURL == "" {
 			baseURL = "http://localhost:8080"
 		} else {
-			baseURL = "https://sipla-app-production.up.railway.app" + baseURL
+			baseURL = "https://" + baseURL
 		}
 
 		for rows.Next() {
@@ -180,7 +210,7 @@ func main() {
 		if baseURL == "" {
 			baseURL = "http://localhost:8080"
 		} else {
-			baseURL = "https://sipla-app-production.up.railway.app" + baseURL
+			baseURL = "https://" + baseURL
 		}
 
 		return c.JSON(fiber.Map{
