@@ -47,15 +47,21 @@ func main() {
 
 	app := fiber.New()
 
+	// FITUR CORS: Diletakkan paling atas agar tidak memblokir browser
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
-		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
+		AllowMethods: "GET, POST, PUT, DELETE, OPTIONS",
 	}))
 
 	app.Static("/assets/pengaduan", "./assets/pengaduan")
 
-	// ==================== ENDPOINT LOGIN & REGISTER (KODE ASLI LU) ====================
-	app.Post("/register", func(c *fiber.Ctx) error {
+	// ==================== ROUTE GROUPING (MENYESUAIKAN FRONTEND AXIOS) ====================
+	api := app.Group("/api")
+	auth := api.Group("/auth") // Berarti jalurnya jadi /api/auth
+
+	// Endpoint /api/auth/register
+	auth.Post("/register", func(c *fiber.Ctx) error {
 		var user User
 		if err := c.BodyParser(&user); err != nil {
 			return c.Status(400).SendString(err.Error())
@@ -68,7 +74,8 @@ func main() {
 		return c.JSON(user)
 	})
 
-	app.Post("/login", func(c *fiber.Ctx) error {
+	// Endpoint /api/auth/login (Atau sesuaikan jika frontend lu manggil /api/auth/login)
+	auth.Post("/login", func(c *fiber.Ctx) error {
 		var user User
 		if err := c.BodyParser(&user); err != nil {
 			return c.Status(400).SendString(err.Error())
@@ -80,7 +87,21 @@ func main() {
 		return c.JSON(user)
 	})
 
-	app.Get("/masyarakat", func(c *fiber.Ctx) error {
+	// Endpoint cadangan jika frontend lu nembaknya langsung ke /api/login
+	api.Post("/login", func(c *fiber.Ctx) error {
+		var user User
+		if err := c.BodyParser(&user); err != nil {
+			return c.Status(400).SendString(err.Error())
+		}
+		err = db.QueryRow("SELECT id, role FROM user WHERE username = ? AND password = ?", user.Username, user.Password).Scan(&user.ID, &user.Role)
+		if err != nil {
+			return c.Status(401).SendString("Username atau password salah")
+		}
+		return c.JSON(user)
+	})
+
+	// Endpoint /api/masyarakat
+	api.Get("/masyarakat", func(c *fiber.Ctx) error {
 		rows, err := db.Query("SELECT id, username, role FROM user WHERE role = 'masyarakat'")
 		if err != nil {
 			return c.Status(500).SendString(err.Error())
@@ -98,7 +119,8 @@ func main() {
 		return c.JSON(users)
 	})
 
-	app.Get("/kategori", func(c *fiber.Ctx) error {
+	// Endpoint /api/kategori
+	api.Get("/kategori", func(c *fiber.Ctx) error {
 		rows, err := db.Query("SELECT id, nama_kategori FROM kategori")
 		if err != nil {
 			return c.Status(500).SendString(err.Error())
@@ -116,8 +138,8 @@ func main() {
 		return c.JSON(kategoris)
 	})
 
-	// ==================== ENDPOINT ASPIRASI (SUDAH DI-FIX JALUR GAMBARNYA) ====================
-	app.Get("/aspirasi", func(c *fiber.Ctx) error {
+	// Endpoint /api/aspirasi
+	api.Get("/aspirasi", func(c *fiber.Ctx) error {
 		rows, err := db.Query("SELECT id, id_user, id_kategori, deskripsi, foto, status FROM aspirasi")
 		if err != nil {
 			return c.Status(500).SendString(err.Error())
@@ -126,11 +148,8 @@ func main() {
 
 		var aspirasis []Aspirasi
 
-		// Mengambil base URL dinamis dari Env Vercel, fallback ke localhost jika di laptop
-		baseURL := os.Getenv("APP_URL")
-		if baseURL == "" {
-			baseURL = "https://sipla-app-backend.vercel.app"
-		}
+		// Kunci langsung ke backend Vercel lu biar anti-gagal bypass mixed content
+		baseURL := "https://sipla-app-backend.vercel.app"
 
 		for rows.Next() {
 			var a Aspirasi
@@ -145,7 +164,8 @@ func main() {
 		return c.JSON(aspirasis)
 	})
 
-	app.Post("/aspirasi", func(c *fiber.Ctx) error {
+	// Endpoint /api/aspirasi (POST)
+	api.Post("/aspirasi", func(c *fiber.Ctx) error {
 		idUser := c.FormValue("id_user")
 		idKategori := c.FormValue("id_kategori")
 		deskripsi := c.FormValue("deskripsi")
@@ -166,10 +186,7 @@ func main() {
 			return c.Status(500).SendString(err.Error())
 		}
 
-		baseURL := os.Getenv("APP_URL")
-		if baseURL == "" {
-			baseURL = "https://sipla-app-backend.vercel.app"
-		}
+		baseURL := "https://sipla-app-backend.vercel.app"
 
 		return c.JSON(fiber.Map{
 			"message": "Aspirasi berhasil ditambahkan",
@@ -177,7 +194,8 @@ func main() {
 		})
 	})
 
-	app.Put("/aspirasi/:id", func(c *fiber.Ctx) error {
+	// Endpoint /api/aspirasi/:id (PUT)
+	api.Put("/aspirasi/:id", func(c *fiber.Ctx) error {
 		id := c.Params("id")
 		status := c.FormValue("status")
 		_, err = db.Exec("UPDATE aspirasi SET status = ? WHERE id = ?", status, id)
