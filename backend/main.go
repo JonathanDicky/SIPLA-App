@@ -129,7 +129,7 @@ func main() {
 		// Mengambil base URL dinamis dari Env Vercel, fallback ke localhost jika di laptop
 		baseURL := os.Getenv("APP_URL")
 		if baseURL == "" {
-			baseURL = "http://localhost:8080"
+			baseURL = "https://sipla-app-backend.vercel.app"
 		}
 
 		for rows.Next() {
@@ -168,7 +168,7 @@ func main() {
 
 		baseURL := os.Getenv("APP_URL")
 		if baseURL == "" {
-			baseURL = "http://localhost:8080"
+			baseURL = "https://sipla-app-backend.vercel.app"
 		}
 
 		return c.JSON(fiber.Map{
