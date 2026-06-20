@@ -47,7 +47,6 @@ func main() {
 
 	app := fiber.New()
 
-	// 1. CORS POLICY PALING AMAN & LONGGAR
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
@@ -85,7 +84,6 @@ func main() {
 		return c.JSON(user)
 	})
 
-	// Penyelamat jika frontend memanggil /api/auth/me atau sejenisnya
 	auth.Get("/me", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "authenticated"})
 	})
@@ -189,8 +187,20 @@ func main() {
 		return c.JSON(fiber.Map{"message": "Aspirasi berhasil diupdate"})
 	})
 
-	// ==================== WILDCARD JALUR DARURAT (ANTI CORS/500 ERROR) ====================
-	// Menangkap semua rute tambahan seperti /api/provinces, /api/kelurahan, /api/public/statistik agar mengembalikan JSON kosong aman.
+	// ==================== DATA WILAYAH & STATISTIK FALLBACK ====================
+	api.Get("/kelurahan", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"status": "success", "data": []string{}})
+	})
+	api.Get("/provinces", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"status": "success", "data": []string{}})
+	})
+
+	publicRoute := api.Group("/public")
+	publicRoute.Get("/statistik", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"status": "success", "total_aspirasi": 0})
+	})
+
+	// Wildcard cadangan umum
 	api.All("/*", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "success", "data": []string{}})
 	})
