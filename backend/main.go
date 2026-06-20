@@ -133,7 +133,14 @@ func main() {
 		defer rows.Close()
 
 		var aspirasis []Aspirasi
-		baseURL := "https://sipla-app-backend.vercel.app"
+
+		// Taruh domain backend Railway lu di sini nanti kalau sudah dapet URL-nya!
+		baseURL := os.Getenv("RAILWAY_STATIC_URL")
+		if baseURL == "" {
+			baseURL = "http://localhost:8080"
+		} else {
+			baseURL = "https://" + baseURL
+		}
 
 		for rows.Next() {
 			var a Aspirasi
@@ -169,22 +176,17 @@ func main() {
 			return c.Status(500).SendString(err.Error())
 		}
 
-		baseURL := "https://sipla-app-backend.vercel.app"
+		baseURL := os.Getenv("RAILWAY_STATIC_URL")
+		if baseURL == "" {
+			baseURL = "http://localhost:8080"
+		} else {
+			baseURL = "https://" + baseURL
+		}
 
 		return c.JSON(fiber.Map{
 			"message": "Aspirasi berhasil ditambahkan",
 			"foto":    fmt.Sprintf("%s/assets/pengaduan/%s", baseURL, filename),
 		})
-	})
-
-	api.Put("/aspirasi/:id", func(c *fiber.Ctx) error {
-		id := c.Params("id")
-		status := c.FormValue("status")
-		_, err = db.Exec("UPDATE aspirasi SET status = ? WHERE id = ?", status, id)
-		if err != nil {
-			return c.Status(500).SendString(err.Error())
-		}
-		return c.JSON(fiber.Map{"message": "Aspirasi berhasil diupdate"})
 	})
 
 	// ==================== DATA WILAYAH & STATISTIK FALLBACK ====================
@@ -200,7 +202,6 @@ func main() {
 		return c.JSON(fiber.Map{"status": "success", "total_aspirasi": 0})
 	})
 
-	// Wildcard cadangan umum
 	api.All("/*", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "success", "data": []string{}})
 	})
